@@ -22,6 +22,9 @@ jobs:
             sudo apt-get update -q
             apt list --upgradable 2>/dev/null || true
 
+            echo "--- Removing unused Docker images ---"
+            sudo docker image prune -af
+
             echo "--- Docker images currently in use ---"
             sudo docker images
 

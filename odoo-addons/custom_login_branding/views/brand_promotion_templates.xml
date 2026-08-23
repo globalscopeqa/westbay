@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!--
+    web.brand_promotion_message renders the "Powered by Odoo" badge
+    used by portal, website, forum and eLearning pages (not just the
+    backend). Matched on the href rather than position/index so this
+    keeps working across minor core template edits.
+  -->
+  <template id="brand_promotion_message_branding" inherit_id="web.brand_promotion_message" name="Brand Promotion Message Branding">
+    <xpath expr="//a[contains(@t-attf-href, 'odoo.com')]" position="replace">
+      <a target="_blank" href="https://globalscope.qa" class="badge text-bg-light">Global Scope</a>
+    </xpath>
+  </template>
+
+</odoo>

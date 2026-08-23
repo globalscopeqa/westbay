@@ -44,6 +44,10 @@ jobs:
                     internal;
                 }
 
+                location /profile/ {
+                    rewrite ^/profile/(.*)$ https://profile.westbaycomputer.com/$1 permanent;
+                }
+
                 location / {
                     try_files $uri $uri/ =404;
                 }

@@ -45,18 +45,12 @@ jobs:
               sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
             fi
 
-            echo "--- Wiping existing Odoo stack for reinstall ---"
-            if [ -f /opt/odoo/docker-compose.yml ]; then
-              cd /opt/odoo
-              sudo docker compose down -v || true
-              cd -
-            fi
-
             echo "--- Odoo stack ---"
             sudo mkdir -p /opt/odoo
-            sudo rm -f /opt/odoo/.env
-            echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)" | sudo tee /opt/odoo/.env > /dev/null
-            sudo chmod 600 /opt/odoo/.env
+            if [ ! -f /opt/odoo/.env ]; then
+              echo "POSTGRES_PASSWORD=$(openssl rand -hex 24)" | sudo tee /opt/odoo/.env > /dev/null
+              sudo chmod 600 /opt/odoo/.env
+            fi
 
             sudo tee /opt/odoo/docker-compose.yml > /dev/null <<'COMPOSE'
             services:

@@ -206,26 +206,6 @@ jobs:
 
             sudo docker restart odoo-odoo-1
 
-      - name: One-time password reset for info@westbaycomputer.com
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_DEPLOY_KEY }}
-          script: |
-            set -euo pipefail
-            sudo docker exec -i odoo-odoo-1 sh -c 'odoo shell -d WestBay --db_host="$HOST" --db_user="$USER" --db_password="$PASSWORD" --no-http' <<'PYEOF'
-            import secrets
-            pwd = secrets.token_urlsafe(12)
-            user = env['res.users'].search([('login', '=', 'info@westbaycomputer.com')], limit=1)
-            if not user:
-                print("RESET_RESULT: USER_NOT_FOUND")
-            else:
-                user.write({'password': pwd})
-                env.cr.commit()
-                print("RESET_RESULT: NEW_TEMP_PASSWORD=" + pwd)
-            PYEOF
-
       - name: Remove uninstalled custom addon (breaks frontend assets otherwise)
         uses: appleboy/ssh-action@v1.0.3
         with:

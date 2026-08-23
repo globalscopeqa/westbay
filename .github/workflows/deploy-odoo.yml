@@ -189,9 +189,7 @@ jobs:
             RESPONSE=$(curl -sS --max-time 10 -X POST http://127.0.0.1:8069/web/database/list \
               -H "Content-Type: application/json" \
               -d '{"jsonrpc":"2.0","method":"call","params":{}}' || true)
-            echo "DEBUG raw /web/database/list response: $RESPONSE"
-            DBS=$(printf '%s' "$RESPONSE" | sed -n 's/.*"result":\[\(.*\)\].*/\1/p' | tr ',' '\n' | tr -d '" ')
-            echo "DEBUG parsed DBS: [$DBS]"
+            DBS=$(printf '%s' "$RESPONSE" | sed -n 's/.*"result":[[:space:]]*\[\(.*\)\].*/\1/p' | tr ',' '\n' | tr -d '" ')
 
             if [ -z "$DBS" ]; then
               echo "No Odoo databases found yet - skipping module install (will apply once a database exists)."

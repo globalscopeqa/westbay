@@ -53,6 +53,24 @@ jobs:
                     add_header Cache-Control "public, immutable";
                 }
             }
+
+            server {
+                listen 80;
+                listen [::]:80;
+                server_name profile.westbaycomputer.com;
+
+                root /var/www/westbaycomputer.com/profile;
+                index index.html;
+
+                location / {
+                    try_files $uri $uri/ =404;
+                }
+
+                location ~* \.(?:css|js|png|jpg|jpeg|gif|ico|svg|woff2?)$ {
+                    expires 30d;
+                    add_header Cache-Control "public, immutable";
+                }
+            }
             NGINX
             sudo rm -f /etc/nginx/sites-enabled/default
             sudo ln -sf /etc/nginx/sites-available/westbaycomputer.conf /etc/nginx/sites-enabled/westbaycomputer.conf
@@ -72,7 +90,7 @@ jobs:
               sudo apt-get install -y certbot python3-certbot-nginx
             fi
             sudo certbot --nginx \
-              -d westbaycomputer.com -d www.westbaycomputer.com \
+              -d westbaycomputer.com -d www.westbaycomputer.com -d profile.westbaycomputer.com \
               --non-interactive --agree-tos -m info@westbaycomputer.com \
               --redirect
             sudo nginx -t

@@ -1,0 +1,37 @@
+name: Check System
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for OS, Docker image, and network updates
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+
+            echo "--- OS package updates ---"
+            sudo apt-get update -q
+            apt list --upgradable 2>/dev/null || true
+
+            echo "--- Docker images currently in use ---"
+            sudo docker images
+
+            echo "--- Checking for newer Odoo/Postgres images ---"
+            cd /opt/odoo
+            sudo docker compose pull
+
+            echo "--- ufw status ---"
+            sudo ufw status verbose || true
+
+            echo "--- Ports listening ---"
+            sudo ss -tlnp | grep -E ':80 |:443 |:8069|:8072' || true
+
+            echo "--- Odoo reachability from inside the VPS itself ---"
+            curl -sS -o /dev/null -w "local http://127.0.0.1:8069 -> %{http_code}\n" --max-time 5 http://127.0.0.1:8069/ || echo "local request to 8069 failed"

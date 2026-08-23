@@ -72,8 +72,8 @@ jobs:
                   USER: odoo
                   PASSWORD: ${POSTGRES_PASSWORD}
                 ports:
-                  - "127.0.0.1:8069:8069"
-                  - "127.0.0.1:8072:8072"
+                  - "8069:8069"
+                  - "8072:8072"
                 volumes:
                   - odoo-web-data:/var/lib/odoo
                   - odoo-addons:/mnt/extra-addons
@@ -86,6 +86,11 @@ jobs:
 
             cd /opt/odoo
             sudo docker compose up -d
+
+            if sudo ufw status | grep -q "Status: active"; then
+              sudo ufw allow 8069/tcp
+              sudo ufw allow 8072/tcp
+            fi
 
             echo "--- nginx reverse proxy for erp.westbaycomputer.com ---"
             sudo tee /etc/nginx/sites-available/erp.westbaycomputer.com.conf > /dev/null <<'NGINX'

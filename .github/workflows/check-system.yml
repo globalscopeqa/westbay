@@ -2,6 +2,10 @@ name: Check System
 
 on:
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/check-system.yml'
 
 jobs:
   check:

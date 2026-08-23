@@ -77,6 +77,7 @@ jobs:
             }
             NGINX
             sudo rm -f /etc/nginx/sites-enabled/default
+            sudo rm -f /etc/nginx/sites-enabled/westbaycomputer.com /etc/nginx/sites-available/westbaycomputer.com
             sudo ln -sf /etc/nginx/sites-available/westbaycomputer.conf /etc/nginx/sites-enabled/westbaycomputer.conf
             sudo nginx -t
             sudo systemctl reload nginx

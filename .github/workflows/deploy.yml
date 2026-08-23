@@ -58,3 +58,22 @@ jobs:
             sudo ln -sf /etc/nginx/sites-available/westbaycomputer.conf /etc/nginx/sites-enabled/westbaycomputer.conf
             sudo nginx -t
             sudo systemctl reload nginx
+
+      - name: Obtain/renew TLS cert and force HTTPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+            if ! command -v certbot >/dev/null 2>&1; then
+              sudo apt-get update
+              sudo apt-get install -y certbot python3-certbot-nginx
+            fi
+            sudo certbot --nginx \
+              -d westbaycomputer.com -d www.westbaycomputer.com \
+              --non-interactive --agree-tos -m info@westbaycomputer.com \
+              --redirect
+            sudo nginx -t
+            sudo systemctl reload nginx

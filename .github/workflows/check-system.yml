@@ -49,8 +49,22 @@ jobs:
             cd /opt/odoo
             sudo docker compose pull
 
+            echo "--- Harden: firewall + fail2ban ---"
+            sudo apt-get install -y ufw fail2ban
+            sudo ufw allow 22/tcp
+            sudo ufw allow 80/tcp
+            sudo ufw allow 443/tcp
+            sudo ufw allow 8069/tcp
+            sudo ufw allow 8072/tcp
+            sudo ufw --force enable
+            sudo systemctl enable --now fail2ban
+
             echo "--- ufw status ---"
             sudo ufw status verbose || true
+
+            echo "--- fail2ban status ---"
+            sudo fail2ban-client status || true
+            sudo fail2ban-client status sshd || true
 
             echo "--- Ports listening ---"
             sudo ss -tlnp | grep -E ':80 |:443 |:8069|:8072' || true

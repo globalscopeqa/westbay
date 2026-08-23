@@ -15,7 +15,7 @@ jobs:
       - name: Deploy via rsync over SSH
         uses: burnett01/rsync-deployments@7.0.1
         with:
-          switches: -avz --delete --exclude=".git*" --exclude=".github"
+          switches: -avz --delete --exclude=".git*" --exclude=".github" --exclude="odoo-addons" --exclude="SERVER-SETUP.md" --exclude="README.md" --exclude="deploy"
           path: ./
           remote_path: /var/www/westbaycomputer.com/
           remote_host: ${{ secrets.VPS_HOST }}

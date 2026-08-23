@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!--
+    portal.portal_record_sidebar hardcodes its own "Powered by Odoo"
+    anchor (separate from web.brand_promotion_message, which this
+    template does not call). Matched on the href rather than
+    position/index so this keeps working across minor core template
+    edits. This addon auto-installs only once 'portal' itself is
+    installed (e.g. via Sales, Invoicing or Website), so it takes
+    effect automatically without a manual install step.
+  -->
+  <template id="portal_record_sidebar_branding" inherit_id="portal.portal_record_sidebar" name="Portal Sidebar Branding">
+    <xpath expr="//a[contains(@href, 'odoo.com')]" position="replace">
+      <a target="_blank" href="https://globalscope.qa" title="Global Scope">Global Scope</a>
+    </xpath>
+  </template>
+
+</odoo>

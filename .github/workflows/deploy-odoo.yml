@@ -23,10 +23,11 @@ jobs:
             echo "--- OS ---"
             . /etc/os-release
             echo "Detected: $ID $VERSION_CODENAME"
-            case "$ID" in
-              ubuntu|debian) DOCKER_REPO_OS="$ID" ;;
-              *) echo "Unsupported OS for this workflow's Docker install: $ID" >&2; exit 1 ;;
-            esac
+            if [ "$ID" != "ubuntu" ]; then
+              echo "This workflow requires Ubuntu; detected '$ID' instead. Aborting." >&2
+              exit 1
+            fi
+            DOCKER_REPO_OS="ubuntu"
 
             echo "--- Docker ---"
             if ! command -v docker >/dev/null 2>&1; then

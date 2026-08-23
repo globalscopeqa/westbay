@@ -39,6 +39,13 @@ jobs:
             sudo apt-get update -q
             apt list --upgradable 2>/dev/null || true
 
+            echo "--- Applying OS package upgrades ---"
+            sudo DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
+            if [ -f /var/run/reboot-required ]; then
+              echo "--- Reboot required after these updates ---"
+              cat /var/run/reboot-required.pkgs 2>/dev/null || true
+            fi
+
             echo "--- Removing unused Docker images ---"
             sudo docker image prune -af
 

@@ -9,6 +9,8 @@ jobs:
   deploy-odoo:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Install Docker, bring up Odoo + Postgres, configure nginx + TLS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -137,3 +139,31 @@ jobs:
             sudo certbot --nginx -d erp.westbaycomputer.com \
               --non-interactive --agree-tos -m info@westbaycomputer.com \
               --redirect || echo "certbot failed - check that DNS for erp.westbaycomputer.com points at this server yet, then re-run this workflow"
+
+      - name: Upload custom addons to staging directory
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          source: "odoo-addons/*"
+          target: "/tmp/odoo-addons-upload"
+          strip_components: 1
+          overwrite: true
+
+      - name: Copy addons into Odoo container and restart
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+            for module in /tmp/odoo-addons-upload/*/; do
+              name=$(basename "$module")
+              echo "--- Installing addon into container: $name ---"
+              sudo docker exec odoo-odoo-1 rm -rf "/mnt/extra-addons/$name"
+              sudo docker cp "$module" "odoo-odoo-1:/mnt/extra-addons/$name"
+            done
+            sudo rm -rf /tmp/odoo-addons-upload
+            sudo docker restart odoo-odoo-1

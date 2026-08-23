@@ -90,3 +90,8 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+            echo "--- Rebooting VPS now ---"
+            sudo sh -c 'sleep 2 && reboot' >/dev/null 2>&1 &
+            disown
+            echo "Reboot scheduled; ending SSH session."

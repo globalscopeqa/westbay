@@ -18,6 +18,9 @@ jobs:
           script: |
             set -euo pipefail
 
+            echo "--- Live nginx config ---"
+            sudo cat /etc/nginx/sites-enabled/westbaycomputer.conf
+
             echo "--- Disk usage before cleanup ---"
             df -h /
 

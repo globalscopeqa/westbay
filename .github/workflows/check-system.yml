@@ -58,6 +58,9 @@ jobs:
             echo "--- Odoo reachability from inside the VPS itself ---"
             curl -sS -w "\nlocal http://127.0.0.1:8069 -> %{http_code}\n" --max-time 5 http://127.0.0.1:8069/ || echo "local request to 8069 failed"
 
+            echo "--- extra-addons contents ---"
+            sudo docker exec odoo-odoo-1 ls -la /mnt/extra-addons
+
             echo "--- Odoo container status ---"
             sudo docker ps -a --filter name=odoo
 

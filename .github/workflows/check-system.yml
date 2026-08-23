@@ -56,7 +56,13 @@ jobs:
             sudo ss -tlnp | grep -E ':80 |:443 |:8069|:8072' || true
 
             echo "--- Odoo reachability from inside the VPS itself ---"
-            curl -sS -o /dev/null -w "local http://127.0.0.1:8069 -> %{http_code}\n" --max-time 5 http://127.0.0.1:8069/ || echo "local request to 8069 failed"
+            curl -sS -w "\nlocal http://127.0.0.1:8069 -> %{http_code}\n" --max-time 5 http://127.0.0.1:8069/ || echo "local request to 8069 failed"
+
+            echo "--- Odoo container status ---"
+            sudo docker ps -a --filter name=odoo
+
+            echo "--- Odoo container logs (last 80 lines) ---"
+            sudo docker logs --tail 80 odoo-odoo-1
 
             echo "--- Disk usage after cleanup ---"
             df -h /

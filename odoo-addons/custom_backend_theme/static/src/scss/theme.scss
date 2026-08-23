@@ -1,0 +1,81 @@
+// Custom backend re-skin. Original design — not derived from any
+// proprietary Odoo Enterprise stylesheet. Uses only Community's own
+// Bootstrap CSS variables and DOM structure.
+
+:root {
+    --ct-navbar-bg: #1e2a3a;
+    --ct-navbar-text: #eef1f5;
+    --ct-accent: #2c6e8f;
+    --ct-radius: 6px;
+}
+
+.o_main_navbar {
+    background-color: var(--ct-navbar-bg) !important;
+    border-bottom: none !important;
+
+    > * {
+        color: var(--ct-navbar-text);
+    }
+
+    .o_menu_brand,
+    .o_navbar_apps_menu button,
+    .o_menu_sections button,
+    .o_menu_sections .o_nav_entry,
+    .o_menu_sections_more button {
+        color: var(--ct-navbar-text) !important;
+        background-color: var(--ct-navbar-bg) !important;
+        border-radius: var(--ct-radius);
+    }
+
+    .o_menu_sections button:hover,
+    .o_menu_sections .o_nav_entry:hover,
+    .o_menu_sections_more button:hover,
+    .o_navbar_apps_menu button:hover {
+        background-color: rgba(255, 255, 255, 0.12) !important;
+    }
+
+    .o_menu_sections button.active,
+    .o_menu_sections .o_nav_entry.active {
+        background-color: rgba(255, 255, 255, 0.16) !important;
+    }
+}
+
+.o_web_client {
+    .btn-primary {
+        background-color: var(--ct-accent);
+        border-color: var(--ct-accent);
+        border-radius: var(--ct-radius);
+    }
+}
+
+// Odoo's shared Dropdown component (systray menus, section menus, the
+// breadcrumb "more" menu, etc.) renders with default light Bootstrap
+// styling regardless of the navbar's theme. Restyle it to match so
+// every menu triggered from the navbar looks like one cohesive system.
+.o-dropdown--menu.dropdown-menu {
+    background-color: var(--ct-navbar-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--ct-radius);
+    color: var(--ct-navbar-text);
+
+    .dropdown-item,
+    .o-dropdown-item {
+        color: var(--ct-navbar-text);
+
+        &:hover,
+        &:focus,
+        &.focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--ct-navbar-text);
+        }
+    }
+
+    .dropdown-header,
+    .dropdown-menu_group {
+        color: rgba(238, 241, 245, 0.55);
+    }
+
+    .dropdown-divider {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}

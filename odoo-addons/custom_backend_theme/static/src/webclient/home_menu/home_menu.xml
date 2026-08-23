@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+  <t t-name="custom_backend_theme.HomeMenu">
+    <div class="o_custom_home_menu" t-on-keydown="onKeydown" tabindex="-1">
+      <div class="o_custom_home_menu_backdrop" t-on-click="() => this.props.close()"/>
+      <div class="o_custom_home_menu_content">
+        <div class="o_custom_home_menu_search">
+          <input
+            type="text"
+            t-ref="searchInput"
+            placeholder="Search apps..."
+            t-model="state.query"
+          />
+          <button class="o_custom_home_menu_close" t-on-click="() => this.props.close()" aria-label="Close">
+            <i class="fa fa-times"/>
+          </button>
+        </div>
+        <div class="o_custom_home_menu_grid">
+          <div t-foreach="filteredApps" t-as="app" t-key="app.id"
+               class="o_custom_home_menu_tile"
+               t-on-click="() => this.selectApp(app)">
+            <img t-if="app.webIconData" t-attf-src="{{app.webIconData}}"/>
+            <span t-esc="app.name"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </t>
+
+</templates>

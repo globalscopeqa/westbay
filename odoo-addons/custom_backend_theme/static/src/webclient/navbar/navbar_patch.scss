@@ -1,0 +1,29 @@
+// Desktop's original apps dropdown is replaced by .o_custom_apps_menu
+// below. Only the desktop wrapper is targeted, so the mobile burger
+// menu (a separate element/class) is unaffected.
+.o_navbar_apps_menu {
+    display: none !important;
+}
+
+.o_custom_apps_menu {
+    display: flex;
+    align-items: center;
+
+    button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--ct-navbar-text, #f4f4fb);
+        padding: 0 14px;
+        height: 100%;
+        font-size: 1.15rem;
+        cursor: pointer;
+        border-radius: var(--ct-radius, 8px);
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.12);
+        }
+    }
+}

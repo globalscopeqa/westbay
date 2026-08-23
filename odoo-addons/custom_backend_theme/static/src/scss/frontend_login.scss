@@ -1,0 +1,24 @@
+// The login page (/web/login) renders via web.frontend_layout, a
+// separate asset bundle from the backend webclient, so it needs its
+// own scoped override. Kept narrow to the login card only, so it
+// doesn't bleed into other frontend/portal pages sharing this bundle.
+.o_database_list {
+    .btn-primary {
+        background-color: #2c6e8f;
+        border-color: #2c6e8f;
+
+        &:hover,
+        &:focus {
+            background-color: #235773;
+            border-color: #235773;
+        }
+    }
+
+    a {
+        color: #2c6e8f;
+    }
+
+    a:hover {
+        color: #235773;
+    }
+}

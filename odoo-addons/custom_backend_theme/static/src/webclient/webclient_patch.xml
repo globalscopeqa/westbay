@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+  <!--
+    Renders the same custom home-menu grid used by the navbar's apps
+    button as the startup screen, replacing Community's default
+    behavior of auto-opening the first installed app. Pure extension
+    of web.WebClient via t-inherit.
+  -->
+  <t t-name="custom_backend_theme.WebClient" t-inherit="web.WebClient" t-inherit-mode="primary">
+    <xpath expr="//MainComponentsContainer" position="after">
+      <t t-if="homeMenuState.isOpened">
+        <CustomHomeMenu close="() => this.closeHomeMenu()"/>
+      </t>
+    </xpath>
+  </t>
+
+</templates>

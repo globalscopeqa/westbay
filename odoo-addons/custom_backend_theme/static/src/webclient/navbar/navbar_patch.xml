@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+  <!--
+    Inserts a new apps-menu button next to the original one (which is
+    hidden via CSS, see navbar_patch.scss). The original's t-call is
+    left untouched so the mobile sidebar experience is unaffected.
+    Pure extension of web.NavBar via t-inherit — no Enterprise template
+    or code is referenced or copied.
+  -->
+  <t t-name="custom_backend_theme.NavBar" t-inherit="web.NavBar" t-inherit-mode="primary">
+    <xpath expr="//t[@t-call='web.NavBar.AppsMenu']" position="after">
+      <div t-if="!isScopedApp and !this.ui.isSmall" class="o_custom_apps_menu">
+        <button title="Home Menu" t-on-click="() => this.toggleHomeMenu()">
+          <i class="oi oi-apps" />
+        </button>
+      </div>
+    </xpath>
+  </t>
+
+</templates>

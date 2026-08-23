@@ -11,6 +11,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Prepare addons directory on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+            sudo mkdir -p /opt/odoo/addons
+            sudo chown -R "$(whoami):$(whoami)" /opt/odoo/addons
+
+      - name: Sync custom Odoo addons to VPS
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avz --delete --exclude="custom_backend_theme"
+          path: ./odoo-addons/
+          remote_path: /opt/odoo/addons/
+          remote_host: ${{ secrets.VPS_HOST }}
+          remote_user: ${{ secrets.VPS_USER }}
+          remote_key: ${{ secrets.VPS_DEPLOY_KEY }}
+
       - name: Install Docker, bring up Odoo + Postgres, configure nginx + TLS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -80,13 +101,14 @@ jobs:
                   - "8072:8072"
                 volumes:
                   - odoo-web-data:/var/lib/odoo
-                  - odoo-addons:/mnt/extra-addons
+                  - /opt/odoo/addons:/mnt/extra-addons
 
             volumes:
               odoo-db-data:
               odoo-web-data:
-              odoo-addons:
             COMPOSE
+
+            sudo chmod -R a+rX /opt/odoo/addons
 
             cd /opt/odoo
             sudo docker compose up -d
@@ -139,6 +161,50 @@ jobs:
             sudo certbot --nginx -d erp.westbaycomputer.com \
               --non-interactive --agree-tos -m info@westbaycomputer.com \
               --redirect || echo "certbot failed - check that DNS for erp.westbaycomputer.com points at this server yet, then re-run this workflow"
+
+      - name: Install/update custom_login_branding addon
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+
+            echo "--- Waiting for Odoo to accept requests ---"
+            ok=""
+            for i in $(seq 1 15); do
+              if curl -sS --max-time 5 -o /dev/null http://127.0.0.1:8069/web/database/list; then
+                ok=1
+                break
+              fi
+              sleep 2
+            done
+            if [ -z "$ok" ]; then
+              echo "Odoo did not become reachable in time - skipping module install."
+              exit 0
+            fi
+
+            echo "--- Discovering databases ---"
+            RESPONSE=$(curl -sS --max-time 10 -X POST http://127.0.0.1:8069/web/database/list \
+              -H "Content-Type: application/json" \
+              -d '{"jsonrpc":"2.0","method":"call","params":{}}' || true)
+            DBS=$(printf '%s' "$RESPONSE" | sed -n 's/.*"result":\[\(.*\)\].*/\1/p' | tr ',' '\n' | tr -d '" ')
+
+            if [ -z "$DBS" ]; then
+              echo "No Odoo databases found yet - skipping module install (will apply once a database exists)."
+              exit 0
+            fi
+
+            for db in $DBS; do
+              echo "Installing/updating custom_login_branding on database: $db"
+              sudo docker exec odoo-odoo-1 sh -c \
+                'odoo -d "$1" --db_host="$HOST" --db_user="$USER" --db_password="$PASSWORD" -i custom_login_branding -u custom_login_branding --stop-after-init' \
+                sh "$db" \
+                || echo "WARNING: module install/update failed for database $db"
+            done
+
+            sudo docker restart odoo-odoo-1
 
       - name: Remove uninstalled custom addon (breaks frontend assets otherwise)
         uses: appleboy/ssh-action@v1.0.3

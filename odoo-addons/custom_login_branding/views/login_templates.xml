@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!--
+    web.login_layout's footer normally links to odoo.com ("Powered by
+    Odoo"). Matched on the href rather than position/index so this
+    keeps working across minor core template edits.
+  -->
+  <template id="login_footer_branding" inherit_id="web.login_layout" name="Login Footer Branding">
+    <xpath expr="//a[contains(@href, 'odoo.com')]" position="replace">
+      <a href="https://globalscope.qa" target="_blank">Powered by <span>Global Scope</span></a>
+    </xpath>
+  </template>
+
+</odoo>

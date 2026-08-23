@@ -5,10 +5,6 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: vps-deploy
-  cancel-in-progress: false
-
 jobs:
   deploy-odoo:
     runs-on: ubuntu-latest
@@ -162,9 +158,20 @@ jobs:
             if ! command -v certbot >/dev/null 2>&1; then
               sudo apt-get install -y certbot python3-certbot-nginx
             fi
-            sudo certbot --nginx -d erp.westbaycomputer.com \
-              --non-interactive --agree-tos -m info@westbaycomputer.com \
-              --redirect || echo "certbot failed - check that DNS for erp.westbaycomputer.com points at this server yet, then re-run this workflow"
+            certbot_ok=""
+            for i in $(seq 1 6); do
+              if sudo certbot --nginx -d erp.westbaycomputer.com \
+                --non-interactive --agree-tos -m info@westbaycomputer.com \
+                --redirect; then
+                certbot_ok=1
+                break
+              fi
+              echo "certbot busy or DNS not ready - retrying in 10s..."
+              sleep 10
+            done
+            if [ -z "$certbot_ok" ]; then
+              echo "certbot failed - check that DNS for erp.westbaycomputer.com points at this server yet, then re-run this workflow"
+            fi
 
       - name: Install/update custom_login_branding addon
         uses: appleboy/ssh-action@v1.0.3

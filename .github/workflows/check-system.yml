@@ -5,10 +5,6 @@ on:
   push:
     branches: [main]
 
-concurrency:
-  group: vps-deploy
-  cancel-in-progress: false
-
 jobs:
   check:
     runs-on: ubuntu-latest

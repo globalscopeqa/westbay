@@ -88,6 +88,3 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
-
-            echo "--- ONE-TIME: template id enclosing the favicon link ---"
-            sudo docker exec odoo-odoo-1 sh -c "sed -n '1,30p' /usr/lib/python3/dist-packages/odoo/addons/web/views/webclient_templates.xml"

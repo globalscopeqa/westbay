@@ -8,7 +8,6 @@
     'data': [
         'views/login_templates.xml',
         'views/brand_promotion_templates.xml',
-        'data/favicon_data.xml',
     ],
     'installable': True,
     'application': False,

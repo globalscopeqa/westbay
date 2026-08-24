@@ -113,6 +113,14 @@ jobs:
             cd /opt/odoo
             sudo docker compose up -d
 
+            echo "--- West Bay favicon (overwrite Odoo's default favicon.ico) ---"
+            for i in $(seq 1 15); do
+              sudo docker exec odoo-odoo-1 test -f /usr/lib/python3/dist-packages/odoo/addons/web/static/img/favicon.ico && break
+              sleep 2
+            done
+            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/favicon.ico \
+              odoo-odoo-1:/usr/lib/python3/dist-packages/odoo/addons/web/static/img/favicon.ico
+
             echo "--- nginx reverse proxy for erp.westbaycomputer.com ---"
             sudo tee /etc/nginx/sites-available/erp.westbaycomputer.com.conf > /dev/null <<'NGINX'
             server {

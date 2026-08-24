@@ -61,8 +61,6 @@ jobs:
             sudo ufw allow 22/tcp
             sudo ufw allow 80/tcp
             sudo ufw allow 443/tcp
-            sudo ufw allow 8069/tcp
-            sudo ufw allow 8072/tcp
             sudo ufw --force enable
             sudo systemctl enable --now fail2ban
 
@@ -90,3 +88,29 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+      - name: One-time hardening - close public Odoo ports, disable SSH password auth
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          script: |
+            set -euo pipefail
+
+            echo "--- Removing now-unneeded ufw rules for 8069/8072 (Odoo is bound to 127.0.0.1 now) ---"
+            sudo ufw delete allow 8069/tcp || true
+            sudo ufw delete allow 8072/tcp || true
+            sudo ufw status verbose
+
+            echo "--- Confirming Odoo ports are no longer reachable on the public interface ---"
+            sudo ss -tlnp | grep -E ':8069|:8072' || true
+
+            echo "--- Disabling SSH password authentication (key-only) ---"
+            sudo sed -i 's/^#\?PasswordAuthentication .*/PasswordAuthentication no/' /etc/ssh/sshd_config
+            grep -E '^PasswordAuthentication' /etc/ssh/sshd_config
+            sudo sshd -t
+            sudo systemctl reload ssh
+
+            echo "--- sshd_config auth settings after change ---"
+            sudo grep -E '^(PermitRootLogin|PasswordAuthentication|PubkeyAuthentication|Port|PermitEmptyPasswords)' /etc/ssh/sshd_config

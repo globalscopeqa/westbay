@@ -88,3 +88,15 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+            echo "--- ONE-TIME: rkhunter presence/version ---"
+            command -v rkhunter && rkhunter --version 2>&1 | head -5 || echo "rkhunter not installed"
+
+            echo "--- ONE-TIME: rkhunter mirror/web config ---"
+            sudo grep -E "^UPDATE_MIRRORS|^MIRRORS_MODE|^WEB_CMD" /etc/rkhunter.conf 2>/dev/null || true
+
+            echo "--- ONE-TIME: general DNS/network reachability (bounded, 10s each) ---"
+            timeout 10 getent hosts sourceforge.net && echo "DNS to sourceforge.net: OK" || echo "DNS to sourceforge.net: FAILED/TIMED OUT"
+            timeout 10 getent hosts rkhunter.sourceforge.net && echo "DNS to rkhunter.sourceforge.net: OK" || echo "DNS to rkhunter.sourceforge.net: FAILED/TIMED OUT"
+            timeout 10 curl -sSI https://sourceforge.net 2>&1 | head -3 || echo "HTTPS to sourceforge.net: FAILED/TIMED OUT"
+            timeout 10 curl -sSI https://google.com 2>&1 | head -3 || echo "HTTPS to google.com (control test): FAILED/TIMED OUT"

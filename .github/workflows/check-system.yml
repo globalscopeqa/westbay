@@ -93,3 +93,6 @@ jobs:
             sudo fail2ban-client set sshd unbanip 178.153.95.143 || true
             echo "--- fail2ban sshd status after unban ---"
             sudo fail2ban-client status sshd || true
+
+            echo "--- ONE-TIME: currently authorized SSH public keys ---"
+            sudo cat /root/.ssh/authorized_keys 2>/dev/null || true

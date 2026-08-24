@@ -88,3 +88,8 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+            echo "--- ONE-TIME: check for Social Marketing / social media addons ---"
+            sudo docker exec odoo-odoo-1 sh -c 'find /usr/lib/python3/dist-packages/odoo/addons /usr/lib/python3/dist-packages/addons /mnt/extra-addons -maxdepth 1 -iname "*social*" 2>/dev/null'
+            echo "--- ONE-TIME: list all available addon module dirs (for reference) ---"
+            sudo docker exec odoo-odoo-1 sh -c 'ls /usr/lib/python3/dist-packages/odoo/addons | wc -l'

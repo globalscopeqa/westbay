@@ -88,3 +88,6 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+            echo "--- ONE-TIME: locate favicon link template in Odoo web addon ---"
+            sudo docker exec odoo-odoo-1 grep -rn "shortcut icon" /usr/lib/python3/dist-packages/odoo/addons/web/ 2>/dev/null || true

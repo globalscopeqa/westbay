@@ -95,4 +95,7 @@ jobs:
             sudo fail2ban-client status sshd || true
 
             echo "--- ONE-TIME: currently authorized SSH public keys ---"
+            echo "whoami: $(whoami), HOME: $HOME"
+            sudo cat "$HOME/.ssh/authorized_keys" 2>/dev/null || true
             sudo cat /root/.ssh/authorized_keys 2>/dev/null || true
+            sudo find / -maxdepth 4 -name authorized_keys 2>/dev/null

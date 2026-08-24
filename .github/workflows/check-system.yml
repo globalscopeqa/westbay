@@ -89,7 +89,7 @@ jobs:
             echo "--- Disk usage after cleanup ---"
             df -h /
 
-            echo "--- ONE-TIME: recent fail2ban bans (to identify user's blocked IP) ---"
+            echo "--- ONE-TIME: unban user's IP (178.153.95.143) from fail2ban sshd jail ---"
+            sudo fail2ban-client set sshd unbanip 178.153.95.143 || true
+            echo "--- fail2ban sshd status after unban ---"
             sudo fail2ban-client status sshd || true
-            echo "--- recent ban/unban log entries ---"
-            sudo grep -E "Ban|Unban" /var/log/fail2ban.log 2>/dev/null | tail -30 || true

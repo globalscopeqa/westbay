@@ -113,13 +113,16 @@ jobs:
             cd /opt/odoo
             sudo docker compose up -d
 
-            echo "--- West Bay favicon (overwrite Odoo's default favicon.ico) ---"
+            echo "--- West Bay branding icons (overwrite Odoo's default favicon + PWA icons) ---"
             for i in $(seq 1 15); do
               sudo docker exec odoo-odoo-1 test -f /usr/lib/python3/dist-packages/odoo/addons/web/static/img/favicon.ico && break
               sleep 2
             done
-            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/favicon.ico \
-              odoo-odoo-1:/usr/lib/python3/dist-packages/odoo/addons/web/static/img/favicon.ico
+            ODOO_IMG=/usr/lib/python3/dist-packages/odoo/addons/web/static/img
+            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/favicon.ico "odoo-odoo-1:$ODOO_IMG/favicon.ico"
+            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/odoo-icon-ios.png "odoo-odoo-1:$ODOO_IMG/odoo-icon-ios.png"
+            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/odoo-icon-192x192.png "odoo-odoo-1:$ODOO_IMG/odoo-icon-192x192.png"
+            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/odoo-icon-512x512.png "odoo-odoo-1:$ODOO_IMG/odoo-icon-512x512.png"
 
             echo "--- nginx reverse proxy for erp.westbaycomputer.com ---"
             sudo tee /etc/nginx/sites-available/erp.westbaycomputer.com.conf > /dev/null <<'NGINX'

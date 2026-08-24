@@ -89,5 +89,5 @@ jobs:
             echo "--- Disk usage after cleanup ---"
             df -h /
 
-            echo "--- ONE-TIME: exact favicon.ico references in web/base/portal addons ---"
-            sudo docker exec odoo-odoo-1 sh -c 'grep -rn "favicon.ico" /usr/lib/python3/dist-packages/odoo/addons/web/ /usr/lib/python3/dist-packages/odoo/addons/base/ /usr/lib/python3/dist-packages/odoo/addons/portal/ /var/lib/odoo/addons/19.0/ 2>/dev/null' || true
+            echo "--- ONE-TIME: template id enclosing the favicon link ---"
+            sudo docker exec odoo-odoo-1 sh -c "sed -n '1,30p' /usr/lib/python3/dist-packages/odoo/addons/web/views/webclient_templates.xml"

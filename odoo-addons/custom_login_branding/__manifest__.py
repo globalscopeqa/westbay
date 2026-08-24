@@ -8,6 +8,7 @@
     'data': [
         'views/login_templates.xml',
         'views/brand_promotion_templates.xml',
+        'views/title_templates.xml',
     ],
     'installable': True,
     'application': False,

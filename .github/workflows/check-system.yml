@@ -88,11 +88,3 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
-
-            echo "--- ONE-TIME: title tag context in web.layout ---"
-            sudo docker exec odoo-odoo-1 sh -c "sed -n '1,45p' /usr/lib/python3/dist-packages/odoo/addons/web/views/webclient_templates.xml"
-
-            echo "--- ONE-TIME: scan all Odoo icon/logo image assets ---"
-            sudo docker exec odoo-odoo-1 sh -c 'find /usr/lib/python3/dist-packages/odoo/addons/web/static/img /usr/lib/python3/dist-packages/odoo/addons/base/static/img -type f \( -iname "*.png" -o -iname "*.ico" -o -iname "*.svg" -o -iname "*.jpg" -o -iname "*.gif" \) 2>/dev/null | sort'
-            echo "--- filenames mentioning odoo/logo/icon specifically ---"
-            sudo docker exec odoo-odoo-1 sh -c 'find /usr/lib/python3/dist-packages/odoo/addons -type f \( -iname "*odoo*logo*" -o -iname "*odoo*icon*" -o -iname "*o_logo*" \) \( -iname "*.png" -o -iname "*.ico" -o -iname "*.svg" \) 2>/dev/null | sort'

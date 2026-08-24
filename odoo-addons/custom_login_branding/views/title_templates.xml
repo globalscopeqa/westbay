@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!--
+    web.layout's <title t-esc="title or 'Odoo'"/> falls back to the
+    literal string "Odoo" whenever a page doesn't set its own title
+    (e.g. the login page, initial webclient bootstrap). Pin the
+    fallback to the West Bay ERP name; per-view titles set by the
+    backend's own JS after login are untouched.
+  -->
+  <template id="page_title_branding" inherit_id="web.layout" name="Page Title Branding">
+    <xpath expr="//title" position="attributes">
+      <attribute name="t-esc">'ERP - WestBay'</attribute>
+    </xpath>
+  </template>
+
+</odoo>

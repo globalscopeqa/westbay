@@ -119,10 +119,24 @@ jobs:
               sleep 2
             done
             ODOO_IMG=/usr/lib/python3/dist-packages/odoo/addons/web/static/img
-            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/favicon.ico "odoo-odoo-1:$ODOO_IMG/favicon.ico"
-            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/odoo-icon-ios.png "odoo-odoo-1:$ODOO_IMG/odoo-icon-ios.png"
-            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/odoo-icon-192x192.png "odoo-odoo-1:$ODOO_IMG/odoo-icon-192x192.png"
-            sudo docker cp /opt/odoo/addons/custom_login_branding/static/img/odoo-icon-512x512.png "odoo-odoo-1:$ODOO_IMG/odoo-icon-512x512.png"
+            ODOO_BASE_IMG=/usr/lib/python3/dist-packages/odoo/addons/base/static/img
+            ODOO_ACCOUNT_IMG=/usr/lib/python3/dist-packages/odoo/addons/account/static/src/img
+            BRAND=/opt/odoo/addons/custom_login_branding/static
+            sudo docker cp "$BRAND/img/favicon.ico" "odoo-odoo-1:$ODOO_IMG/favicon.ico"
+            sudo docker cp "$BRAND/img/odoo-icon-ios.png" "odoo-odoo-1:$ODOO_IMG/odoo-icon-ios.png"
+            sudo docker cp "$BRAND/img/odoo-icon-192x192.png" "odoo-odoo-1:$ODOO_IMG/odoo-icon-192x192.png"
+            sudo docker cp "$BRAND/img/odoo-icon-512x512.png" "odoo-odoo-1:$ODOO_IMG/odoo-icon-512x512.png"
+            sudo docker cp "$BRAND/img/odoo-icon.svg" "odoo-odoo-1:$ODOO_IMG/odoo-icon.svg"
+            sudo docker cp "$BRAND/img/odoo_logo.svg" "odoo-odoo-1:$ODOO_IMG/odoo_logo.svg"
+            sudo docker cp "$BRAND/img/odoo_logo_dark.svg" "odoo-odoo-1:$ODOO_IMG/odoo_logo_dark.svg"
+            sudo docker cp "$BRAND/img/odoo_logo_tiny.png" "odoo-odoo-1:$ODOO_IMG/odoo_logo_tiny.png"
+            sudo docker cp "$BRAND/img/logo.png" "odoo-odoo-1:$ODOO_IMG/logo.png"
+            sudo docker cp "$BRAND/img/logo2.png" "odoo-odoo-1:$ODOO_IMG/logo2.png"
+            sudo docker cp "$BRAND/img/nologo.png" "odoo-odoo-1:$ODOO_IMG/nologo.png"
+            sudo docker cp "$BRAND/img/logo_inverse_white_206px.png" "odoo-odoo-1:$ODOO_IMG/logo_inverse_white_206px.png"
+            sudo docker cp "$BRAND/base_img/logo_white.png" "odoo-odoo-1:$ODOO_BASE_IMG/logo_white.png"
+            sudo docker cp "$BRAND/base_img/demo_logo_report.png" "odoo-odoo-1:$ODOO_BASE_IMG/demo_logo_report.png"
+            sudo docker cp "$BRAND/account_img/Odoo_logo_O.svg" "odoo-odoo-1:$ODOO_ACCOUNT_IMG/Odoo_logo_O.svg"
 
             echo "--- nginx reverse proxy for erp.westbaycomputer.com ---"
             sudo tee /etc/nginx/sites-available/erp.westbaycomputer.com.conf > /dev/null <<'NGINX'

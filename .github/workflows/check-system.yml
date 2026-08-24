@@ -182,12 +182,28 @@ jobs:
             echo; echo "=== unattended-upgrades status ==="
             systemctl is-enabled unattended-upgrades 2>/dev/null || echo "not installed/enabled"
 
-            echo; echo "=== INSTALLING SECURITY SCANNERS (rkhunter + lynis) ==="
+      - name: One-time rootkit/security scanner (rkhunter + lynis)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_DEPLOY_KEY }}
+          command_timeout: 25m
+          script: |
+            set -uo pipefail
+
+            echo "=== INSTALLING SECURITY SCANNERS (rkhunter + lynis) ==="
             sudo DEBIAN_FRONTEND=noninteractive apt-get install -y rkhunter lynis
+            echo "install done: $(date)"
 
             echo; echo "=== RKHUNTER: rootkit / malware scan ==="
+            echo "rkhunter update starting: $(date)"
             sudo rkhunter --update --nocolors || true
+            echo "rkhunter check starting: $(date)"
             sudo rkhunter --check --sk --nocolors 2>&1 | tail -200
+            echo "rkhunter done: $(date)"
 
             echo; echo "=== LYNIS: security audit (quick) ==="
+            echo "lynis starting: $(date)"
             sudo lynis audit system --quick --no-colors 2>&1 | tail -250
+            echo "lynis done: $(date)"

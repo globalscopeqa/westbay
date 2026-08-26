@@ -89,17 +89,8 @@ jobs:
             echo "--- Disk usage after cleanup ---"
             df -h /
 
-            echo "--- ONE-TIME: ensure rkhunter + lynis installed ---"
-            sudo apt-get install -y rkhunter lynis
-
-            echo "--- ONE-TIME: rkhunter check (skipping --update; sourceforge mirror 403s this VPS's IP, bounded timeout) ---"
+            echo "--- ONE-TIME: rkhunter check (skipping --update; sourceforge mirror 403s this VPS's IP, bounded timeout, no bad --disable flag this time) ---"
             set +e
-            sudo timeout 480 rkhunter --check --skip-keypress --nocolors --no-mail-on-warning --disable dns_spoofing 2>&1 | tail -150
+            sudo timeout 480 rkhunter --check --skip-keypress --nocolors --no-mail-on-warning 2>&1 | tail -150
             echo "rkhunter exit status: ${PIPESTATUS[0]}"
-            set -e
-
-            echo "--- ONE-TIME: lynis quick audit (bounded timeout) ---"
-            set +e
-            sudo timeout 300 lynis audit system --quick --no-colors 2>&1 | tail -150
-            echo "lynis exit status: ${PIPESTATUS[0]}"
             set -e

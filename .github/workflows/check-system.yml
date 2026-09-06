@@ -9,17 +9,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: ONE-TIME - external reachability check from clean network
-        run: |
-          for i in 1 2 3; do
-            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 https://westbaycomputer.com/ || echo "FAIL")
-            echo "westbaycomputer.com attempt $i: $code"
-          done
-          for i in 1 2 3; do
-            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 https://profile.westbaycomputer.com/ || echo "FAIL")
-            echo "profile.westbaycomputer.com attempt $i: $code"
-          done
-
       - name: Check for OS, Docker image, and network updates
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -39,7 +28,7 @@ jobs:
             sudo find / -xdev -type f -size +200M \
               -not -path "/var/lib/docker/*" \
               -not -path "/opt/odoo/*" \
-              2>/dev/null
+              2>/dev/null || true
 
             echo "--- Safe cleanup: apt cache, orphaned packages, old journal logs ---"
             sudo apt-get autoremove -y
@@ -99,7 +88,3 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
-
-            echo "--- ONE-TIME: local nginx status for all three vhosts ---"
-            curl -sS -o /dev/null -w "westbaycomputer.com (local): %{http_code}\n" --max-time 10 https://127.0.0.1/ -H "Host: westbaycomputer.com" -k
-            curl -sS -o /dev/null -w "profile.westbaycomputer.com (local): %{http_code}\n" --max-time 10 https://127.0.0.1/ -H "Host: profile.westbaycomputer.com" -k

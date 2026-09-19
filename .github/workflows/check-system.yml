@@ -88,3 +88,8 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+            echo "--- ONE-TIME: rebooting to apply glibc/kernel updates ---"
+            sudo systemctl reboot &
+            sleep 2
+            exit 0

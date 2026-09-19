@@ -22,7 +22,7 @@ jobs:
             df -h /
 
             echo "--- Largest directories ---"
-            sudo du -sh /var/log /var/cache /var/lib/docker /opt /home /root /tmp 2>/dev/null | sort -rh
+            sudo du -sh /var/log /var/cache /var/lib/docker /opt /home /root /tmp 2>/dev/null | sort -rh || true
 
             echo "--- Files over 200MB outside app data (report only, not deleted) ---"
             sudo find / -xdev -type f -size +200M \

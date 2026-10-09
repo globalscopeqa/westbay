@@ -88,15 +88,3 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
-
-            echo "--- ONE-TIME: diagnose odoo-odoo-1 crash/restart loop after odoo.conf mount ---"
-            sudo docker inspect odoo-odoo-1 --format 'Status={{.State.Status}} ExitCode={{.State.ExitCode}} Restarting={{.State.Restarting}} StartedAt={{.State.StartedAt}} Error={{.State.Error}}' || true
-            echo "-- Full recent logs --"
-            sudo docker logs --tail 200 odoo-odoo-1 2>&1 || true
-            echo "-- odoo.conf as seen by host and container --"
-            sudo ls -la /opt/odoo/odoo.conf || true
-            sudo cat /opt/odoo/odoo.conf || true
-            sudo docker exec odoo-odoo-1 ls -la /etc/odoo/odoo.conf || true
-            sudo docker exec odoo-odoo-1 cat /etc/odoo/odoo.conf || true
-            echo "-- Local reachability retry --"
-            curl -sS -w "\nlocal http://127.0.0.1:8069 -> %{http_code}\n" --max-time 5 http://127.0.0.1:8069/ || echo "local request to 8069 failed"

@@ -115,7 +115,7 @@ jobs:
                 volumes:
                   - odoo-web-data:/var/lib/odoo
                   - /opt/odoo/addons:/mnt/extra-addons
-                  - /opt/odoo/odoo.conf:/etc/odoo/odoo.conf:ro
+                  - /opt/odoo/odoo.conf:/etc/odoo/odoo.conf
 
             volumes:
               odoo-db-data:

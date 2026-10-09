@@ -75,6 +75,19 @@ jobs:
               sudo chmod 600 /opt/odoo/.env
             fi
 
+            echo "--- Odoo master (database manager) password ---"
+            if [ ! -f /opt/odoo/odoo.conf ]; then
+              ODOO_ADMIN_PASSWD=$(openssl rand -hex 24)
+              echo "ODOO_ADMIN_PASSWD=$ODOO_ADMIN_PASSWD" | sudo tee -a /opt/odoo/.env > /dev/null
+              sudo tee /opt/odoo/odoo.conf > /dev/null <<EOF
+            [options]
+            addons_path = /mnt/extra-addons
+            data_dir = /var/lib/odoo
+            admin_passwd = $ODOO_ADMIN_PASSWD
+            EOF
+              sudo chmod 600 /opt/odoo/odoo.conf
+            fi
+
             sudo tee /opt/odoo/docker-compose.yml > /dev/null <<'COMPOSE'
             services:
               db:
@@ -102,6 +115,7 @@ jobs:
                 volumes:
                   - odoo-web-data:/var/lib/odoo
                   - /opt/odoo/addons:/mnt/extra-addons
+                  - /opt/odoo/odoo.conf:/etc/odoo/odoo.conf:ro
 
             volumes:
               odoo-db-data:
@@ -156,6 +170,11 @@ jobs:
                     proxy_set_header X-Forwarded-Host $host;
                     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                     proxy_set_header X-Forwarded-Proto $scheme;
+                }
+
+                location ~ ^/web/database/(selector|manager|create|duplicate|drop|backup|restore|list) {
+                    deny all;
+                    return 403;
                 }
 
                 location / {

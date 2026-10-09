@@ -88,15 +88,3 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
-
-            echo "--- ONE-TIME: force phased OS updates (kernel/openssh were held back) ---"
-            sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o APT::Get::Always-Include-Phased-Updates=true upgrade
-            if [ -f /var/run/reboot-required ]; then
-              echo "--- Reboot required after these updates - rebooting now ---"
-              cat /var/run/reboot-required.pkgs 2>/dev/null || true
-              sudo systemctl reboot &
-              sleep 2
-              exit 0
-            else
-              echo "--- No reboot required ---"
-            fi

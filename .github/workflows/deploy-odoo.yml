@@ -85,8 +85,9 @@ jobs:
             data_dir = /var/lib/odoo
             admin_passwd = $ODOO_ADMIN_PASSWD
             EOF
-              sudo chmod 600 /opt/odoo/odoo.conf
+              sudo chmod 644 /opt/odoo/odoo.conf
             fi
+            sudo chmod 644 /opt/odoo/odoo.conf
 
             sudo tee /opt/odoo/docker-compose.yml > /dev/null <<'COMPOSE'
             services:

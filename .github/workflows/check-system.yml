@@ -88,3 +88,24 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+            echo "--- ONE-TIME: trace origin of unexpected database avx42c963a26f ---"
+            echo "-- Postgres: all databases with size and owner --"
+            sudo docker exec odoo-db-1 psql -U odoo -d postgres -c \
+              "SELECT datname, pg_size_pretty(pg_database_size(datname)) AS size, pg_get_userbyid(datdba) AS owner FROM pg_database WHERE datistemplate = false;" || true
+
+            echo "-- Postgres: OID + on-disk mtime (creation-ish timestamp) for avx42c963a26f --"
+            DBOID=$(sudo docker exec odoo-db-1 psql -U odoo -d postgres -tAc "SELECT oid FROM pg_database WHERE datname='avx42c963a26f';" 2>/dev/null || true)
+            echo "oid: $DBOID"
+            if [ -n "$DBOID" ]; then
+              sudo docker exec odoo-db-1 stat "/var/lib/postgresql/data/base/$DBOID" || true
+            fi
+
+            echo "-- Odoo container logs: full history, filtered for database create/manager/avx42c963a26f --"
+            sudo docker logs odoo-odoo-1 2>&1 | grep -iE "database/(manager|create|duplicate|drop)|avx42c963a26f|createdb" | tail -100 || true
+
+            echo "-- nginx access logs: hits on Odoo database-manager endpoints (all rotated logs) --"
+            sudo zgrep -aE "database/(manager|create|duplicate|drop)|/web/database" /var/log/nginx/access.log* 2>/dev/null | tail -100 || true
+
+            echo "-- odoo.conf: is the database manager/list exposed? --"
+            sudo docker exec odoo-odoo-1 cat /etc/odoo/odoo.conf || true

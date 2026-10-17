@@ -88,14 +88,3 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
-
-            echo "--- ONE-TIME: refresh rkhunter's file-properties baseline ---"
-            echo "-- rkhunter --propupd is local-only (no mirror contact), safe after a confirmed-legitimate apt upgrade --"
-            sudo rkhunter --propupd
-            echo "-- Quick re-check to confirm the stale-baseline warnings are gone --"
-            set +e
-            sudo timeout 480 rkhunter --check --skip-keypress --nocolors --no-mail-on-warning
-            RKSTATUS=${PIPESTATUS[0]:-$?}
-            set -e
-            echo "rkhunter exit status: $RKSTATUS"
-            sudo grep -i "warning" /var/log/rkhunter.log | tail -30 || true

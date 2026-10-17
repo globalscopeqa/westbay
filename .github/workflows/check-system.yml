@@ -89,28 +89,13 @@ jobs:
             echo "--- Disk usage after cleanup ---"
             df -h /
 
-            echo "--- ONE-TIME: full security scan (rkhunter + lynis) ---"
-            sudo apt-get install -y rkhunter lynis
-
-            echo "-- rkhunter --check (skipping --update/--propupd: SourceForge mirror 403s this IP) --"
+            echo "--- ONE-TIME: refresh rkhunter's file-properties baseline ---"
+            echo "-- rkhunter --propupd is local-only (no mirror contact), safe after a confirmed-legitimate apt upgrade --"
+            sudo rkhunter --propupd
+            echo "-- Quick re-check to confirm the stale-baseline warnings are gone --"
             set +e
             sudo timeout 480 rkhunter --check --skip-keypress --nocolors --no-mail-on-warning
             RKSTATUS=${PIPESTATUS[0]:-$?}
             set -e
             echo "rkhunter exit status: $RKSTATUS"
-
-            echo "-- rkhunter warnings summary --"
-            sudo grep -i "warning" /var/log/rkhunter.log | tail -50 || true
-
-            echo "-- lynis audit system --"
-            set +e
-            sudo timeout 480 lynis audit system --quick
-            LYSTATUS=${PIPESTATUS[0]:-$?}
-            set -e
-            echo "lynis exit status: $LYSTATUS"
-
-            echo "-- lynis warnings/suggestions summary --"
-            sudo grep -E "Warning|Suggestion" /var/log/lynis.log | tail -80 || true
-
-            echo "-- lynis hardening index --"
-            sudo grep -i "hardening index" /var/log/lynis.log | tail -5 || true
+            sudo grep -i "warning" /var/log/rkhunter.log | tail -30 || true

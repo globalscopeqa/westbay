@@ -71,6 +71,69 @@ jobs:
             sudo fail2ban-client status || true
             sudo fail2ban-client status sshd || true
 
+            echo "--- Harden: safe Lynis suggestions (idempotent) ---"
+            sudo apt-get install -y libpam-tmpdir debsums apt-show-versions auditd acct
+
+            echo "-- fail2ban: protect config from being overwritten by package updates --"
+            if [ ! -f /etc/fail2ban/jail.local ]; then
+              sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+              sudo systemctl restart fail2ban
+            fi
+
+            echo "-- login.defs: password aging, hashing rounds, stricter umask --"
+            sudo sed -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS\t90/' /etc/login.defs
+            sudo sed -i 's/^PASS_MIN_DAYS.*/PASS_MIN_DAYS\t7/' /etc/login.defs
+            sudo sed -i 's/^UMASK.*/UMASK\t027/' /etc/login.defs
+            grep -q "^SHA_CRYPT_MIN_ROUNDS" /etc/login.defs || echo "SHA_CRYPT_MIN_ROUNDS 5000" | sudo tee -a /etc/login.defs > /dev/null
+            grep -q "^SHA_CRYPT_MAX_ROUNDS" /etc/login.defs || echo "SHA_CRYPT_MAX_ROUNDS 100000" | sudo tee -a /etc/login.defs > /dev/null
+
+            echo "-- legal banners --"
+            echo "Authorized access only. All activity may be monitored and reported." | sudo tee /etc/issue > /dev/null
+            echo "Authorized access only. All activity may be monitored and reported." | sudo tee /etc/issue.net > /dev/null
+
+            echo "-- sshd: LogLevel + MaxSessions (port 22 stays unchanged, per standing instruction) --"
+            set_sshd_opt() {
+              local key="$1" val="$2"
+              if grep -qE "^${key}[[:space:]]" /etc/ssh/sshd_config; then
+                sudo sed -i "s/^${key}[[:space:]].*/${key} ${val}/" /etc/ssh/sshd_config
+              elif grep -qE "^#[[:space:]]*${key}[[:space:]]" /etc/ssh/sshd_config; then
+                sudo sed -i "s/^#[[:space:]]*${key}[[:space:]].*/${key} ${val}/" /etc/ssh/sshd_config
+              else
+                echo "${key} ${val}" | sudo tee -a /etc/ssh/sshd_config > /dev/null
+              fi
+            }
+            set_sshd_opt LogLevel VERBOSE
+            set_sshd_opt MaxSessions 2
+            sudo sshd -t && sudo systemctl reload ssh
+
+            echo "-- restrict compilers to root (standard hardening; host only runs containers, no host-level builds) --"
+            for c in /usr/bin/gcc* /usr/bin/cc /usr/bin/as /usr/bin/ld; do
+              [ -e "$c" ] && sudo chmod 750 "$c" && sudo chown root:root "$c" || true
+            done
+
+            echo "-- sysctl hardening (safe subset - leaves net.ipv4.ip_forward alone, Docker needs it) --"
+            sudo tee /etc/sysctl.d/99-hardening.conf > /dev/null <<'SYSCTL'
+            net.ipv4.conf.all.accept_redirects = 0
+            net.ipv4.conf.all.secure_redirects = 0
+            net.ipv4.conf.all.send_redirects = 0
+            net.ipv4.conf.all.accept_source_route = 0
+            net.ipv4.conf.all.log_martians = 1
+            net.ipv4.tcp_syncookies = 1
+            kernel.randomize_va_space = 2
+            fs.suid_dumpable = 0
+            SYSCTL
+            sudo sysctl --system > /dev/null
+
+            echo "-- purge old/removed package configs --"
+            REMOVED_PKGS=$(dpkg -l | awk '/^rc/ {print $2}')
+            if [ -n "$REMOVED_PKGS" ]; then
+              sudo apt-get -y purge $REMOVED_PKGS
+            fi
+
+            echo "-- process accounting + auditd --"
+            sudo systemctl enable --now acct 2>/dev/null || sudo systemctl enable --now psacct 2>/dev/null || true
+            sudo systemctl enable --now auditd || true
+
             echo "--- Ports listening ---"
             sudo ss -tlnp | grep -E ':80 |:443 |:8069|:8072' || true
 

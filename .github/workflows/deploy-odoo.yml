@@ -188,6 +188,8 @@ jobs:
                 }
 
                 add_header X-Frame-Options "SAMEORIGIN";
+                add_header X-Content-Type-Options "nosniff";
+                add_header Referrer-Policy "no-referrer-when-downgrade";
             }
             NGINX
             sudo ln -sf /etc/nginx/sites-available/erp.westbaycomputer.com.conf /etc/nginx/sites-enabled/erp.westbaycomputer.com.conf

@@ -151,8 +151,3 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
-
-            echo "--- ONE-TIME: restart the VPS as requested ---"
-            sudo systemctl reboot &
-            sleep 2
-            exit 0

@@ -134,6 +134,28 @@ jobs:
             sudo systemctl enable --now acct 2>/dev/null || sudo systemctl enable --now psacct 2>/dev/null || true
             sudo systemctl enable --now auditd || true
 
+            echo "-- automatic security updates (unattended-upgrades) --"
+            sudo apt-get install -y unattended-upgrades
+            sudo tee /etc/apt/apt.conf.d/20auto-upgrades > /dev/null <<'EOF'
+            APT::Periodic::Update-Package-Lists "1";
+            APT::Periodic::Download-Upgradeable-Packages "1";
+            APT::Periodic::AutocleanInterval "7";
+            APT::Periodic::Unattended-Upgrade "1";
+            EOF
+            sudo tee /etc/apt/apt.conf.d/50unattended-upgrades > /dev/null <<'EOF'
+            Unattended-Upgrade::Allowed-Origins {
+                "${distro_id}:${distro_codename}-security";
+                "${distro_id}ESMApps:${distro_codename}-apps-security";
+                "${distro_id}ESM:${distro_codename}-infra-security";
+            };
+            Unattended-Upgrade::Remove-Unused-Dependencies "true";
+            Unattended-Upgrade::Automatic-Reboot "false";
+            Unattended-Upgrade::SyslogEnable "true";
+            EOF
+            sudo systemctl enable --now unattended-upgrades || true
+            echo "-- dry-run to confirm the config is valid (security origins only, no auto-reboot) --"
+            sudo unattended-upgrade --dry-run --debug 2>&1 | tail -30 || true
+
             echo "--- Ports listening ---"
             sudo ss -tlnp | grep -E ':80 |:443 |:8069|:8072' || true
 

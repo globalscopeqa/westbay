@@ -156,10 +156,6 @@ jobs:
             echo "-- dry-run to confirm the config is valid (security origins only, no auto-reboot) --"
             sudo unattended-upgrade --dry-run --debug 2>&1 | tail -30 || true
 
-            echo "--- ONE-TIME: verify deployed unattended-upgrades config content directly ---"
-            sudo cat /etc/apt/apt.conf.d/50unattended-upgrades
-            sudo unattended-upgrade --dry-run -v 2>&1 | grep -i "allowed origin" || true
-
             echo "--- Ports listening ---"
             sudo ss -tlnp | grep -E ':80 |:443 |:8069|:8072' || true
 

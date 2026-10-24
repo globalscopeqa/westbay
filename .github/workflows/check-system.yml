@@ -151,3 +151,12 @@ jobs:
 
             echo "--- Disk usage after cleanup ---"
             df -h /
+
+            echo "--- ONE-TIME: rkhunter scan (baseline already refreshed from last full audit) ---"
+            set +e
+            sudo timeout 480 rkhunter --check --skip-keypress --nocolors --no-mail-on-warning
+            RKSTATUS=${PIPESTATUS[0]:-$?}
+            set -e
+            echo "rkhunter exit status: $RKSTATUS"
+            sudo grep -i "warning" /var/log/rkhunter.log | tail -30 || true
+            sudo grep -A5 "System checks summary" /var/log/rkhunter.log | tail -10 || true
